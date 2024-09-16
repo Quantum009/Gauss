@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaussian Solver</title>
+</head>
+<body>
+    <h1>Gaussian Elimination Solver</h1>
+    <div>
+        <label for="size">方程组阶数 (n):</label>
+        <input type="number" id="size" min="2" max="100">
+    </div>
+    <div id="matrix-input"></div>
+    <button onclick="submitMatrix()">提交</button>
+
+    <h2>结果：</h2>
+    <pre id="result"></pre>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
