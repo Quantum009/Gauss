@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "description": "高斯消元法求线性方程组",
   "main": "main.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^32.1.0"
+  }
 }
