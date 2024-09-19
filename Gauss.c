@@ -47,35 +47,13 @@ int main(int argc, char* argv[]) {
     printf("输入的矩阵是:\n");
     printMatrix(matrix, constants, n);
 
-    // 高斯消元法
+    // 高斯消元法（不进行主元选取和行交换）
     for (int i = 0; i < n; i++) {
-        // 部分主元选取
-        int maxRow = i;
-        for (int k = i + 1; k < n; k++) {
-            if (fabs(matrix[k][i]) > fabs(matrix[maxRow][i])) {
-                maxRow = k;
-            }
-        }
-
-        // 如果最大值为0，说明矩阵可能是奇异的，无法求解
-        if (fabs(matrix[maxRow][i]) < 1e-10) {
-            printf("矩阵是奇异的，无法求解。\n");
+        // 检查主对角线元素是否为零
+        if (fabs(matrix[i][i]) < 1e-10) {
+            printf("主对角线元素为零，无法继续计算。\n");
             return 1;
         }
-
-        // 交换行
-        printf("交换第 %d 行和第 %d 行:\n", i + 1, maxRow + 1);
-        for (int k = i; k < n; k++) {
-            double tmp = matrix[maxRow][k];
-            matrix[maxRow][k] = matrix[i][k];
-            matrix[i][k] = tmp;
-        }
-        double tmp = constants[maxRow];
-        constants[maxRow] = constants[i];
-        constants[i] = tmp;
-
-        // 打印交换后的矩阵
-        printMatrix(matrix, constants, n);
 
         // 高斯消元
         for (int k = i + 1; k < n; k++) {
