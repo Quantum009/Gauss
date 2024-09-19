@@ -30,15 +30,24 @@ function submitMatrix() {
     const size = document.getElementById('size').value;
     const matrixInput = document.getElementById('matrix-input');
     let matrixData = '';
+    let matrixDisplay = '';  // 用于在页面上显示矩阵
     
     const rows = document.querySelectorAll('.matrix-row');
-    rows.forEach(row => {
+    rows.forEach((row, rowIndex) => {
         const inputs = row.querySelectorAll('input');
-        inputs.forEach(input => {
+        let rowData = '';
+        
+        inputs.forEach((input, colIndex) => {
             matrixData += `${input.value} `;
+            rowData += `${input.value} `; // 用于格式化展示的行数据
         });
+
+        matrixDisplay += rowData.trim() + '\n';  // 添加每行的矩阵输入
         matrixData += '\n';
     });
+
+    // 在提交前展示输入的矩阵
+    document.getElementById('result').innerText = `输入的矩阵是:\n${matrixDisplay}`;
 
     // 调用C程序
     const gaussianSolver = spawn('./gaussian_solver', [size]);
@@ -49,12 +58,12 @@ function submitMatrix() {
 
     // 处理C程序的输出
     gaussianSolver.stdout.on('data', (data) => {
-        document.getElementById('result').innerText = `C程序输出:\n${data}`;
+        document.getElementById('result').innerText += `\nC程序输出:\n${data}`;
     });
 
     // 捕捉C程序的错误
     gaussianSolver.stderr.on('data', (data) => {
-        document.getElementById('result').innerText = `标准错误:\n${data}`;
+        document.getElementById('result').innerText += `\n标准错误:\n${data}`;
     });
 
     // 监听子进程关闭事件
