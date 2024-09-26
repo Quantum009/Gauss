@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaussian Solver GUI</title>
+    <title>数学计算求解</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -39,11 +39,13 @@
         }
 
         input[type="number"] {
-            width: 100%;
+            width: 50px; /* 设置宽度 */
+            height: 50px; /* 设置高度，使其接近正方形 */
             padding: 10px;
             font-size: 16px;
             border-radius: 4px;
             border: 1px solid #ccc;
+            text-align: center; /* 文字居中 */
         }
 
         button {
@@ -89,18 +91,35 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
+        .add-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .add-row button {
+            width: auto;
+            background-color: #28a745;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
-    <h1>Gaussian Elimination Solver</h1>
+    <h1>高斯消元法求解器</h1>
 
     <div class="container">
         <div class="form-group">
             <label for="size">方程组阶数 (n):</label>
-            <input type="number" id="size" min="2" max="100">
+            <input type="number" id="size" min="2" max="100" value="2" onchange="updateMatrixInput()">
         </div>
 
         <div id="matrix-input" class="form-group"></div>
+
+        <div class="add-row">
+            <button id="subtract-button" onclick="subtractRow()" style="display: none;">−</button>
+            <button id="add-button" onclick="addRow()">+</button>
+        </div>
 
         <button onclick="submitMatrix()">提交</button>
     </div>
@@ -111,5 +130,82 @@
     </div>
 
     <script src="renderer.js"></script>
+    <script>
+        const matrixInputDiv = document.getElementById('matrix-input');
+        const addButton = document.getElementById('add-button');
+        const subtractButton = document.getElementById('subtract-button');
+
+        function updateMatrixInput() {
+            const size = parseInt(document.getElementById('size').value);
+            matrixInputDiv.innerHTML = ''; // 清空当前输入框
+            for (let i = 0; i < size; i++) {
+                addRowInputs(i);
+            }
+            toggleButtons(size);
+        }
+
+        function addRowInputs(rowIndex) {
+            const rowDiv = document.createElement('div');
+            rowDiv.classList.add('form-group');
+
+            const inputX = document.createElement('input');
+            inputX.type = 'number';
+            inputX.placeholder = '□';
+
+            const plusSign = document.createElement('span');
+            plusSign.innerText = '+';
+            plusSign.style.margin = '0 5px';
+
+            const inputY = document.createElement('input');
+            inputY.type = 'number';
+            inputY.placeholder = '□';
+
+            const equalsSign = document.createElement('span');
+            equalsSign.innerText = '=';
+            equalsSign.style.margin = '0 5px';
+
+            const resultInput = document.createElement('input');
+            resultInput.type = 'number';
+            resultInput.placeholder = '□';
+
+            rowDiv.appendChild(inputX);
+            rowDiv.appendChild(plusSign);
+            rowDiv.appendChild(inputY);
+            rowDiv.appendChild(equalsSign);
+            rowDiv.appendChild(resultInput);
+
+            matrixInputDiv.appendChild(rowDiv);
+        }
+
+        function addRow() {
+            const currentSize = parseInt(document.getElementById('size').value);
+            document.getElementById('size').value = currentSize + 1;
+            updateMatrixInput();
+        }
+
+        function subtractRow() {
+            const currentSize = parseInt(document.getElementById('size').value);
+            if (currentSize > 2) {
+                document.getElementById('size').value = currentSize - 1;
+                updateMatrixInput();
+            }
+        }
+
+        function toggleButtons(size) {
+            if (size <= 2) {
+                addButton.style.display = 'inline-block';
+                subtractButton.style.display = 'none';
+            } else if (size >= 100) {
+                addButton.style.display = 'none';
+                subtractButton.style.display = 'inline-block';
+            } else {
+                addButton.style.display = 'inline-block';
+                subtractButton.style.display = 'inline-block';
+            }
+        }
+
+        // 初始填充输入框
+        updateMatrixInput();
+    </script>
 </body>
 </html>
