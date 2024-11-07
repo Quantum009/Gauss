@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-void printMatrix(double matrix[100][100], double constants[100], int n) {
+void printMatrix(double **matrix, double *constants, int n) {
     printf("当前矩阵状态:\n");
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -20,14 +20,18 @@ int main(int argc, char* argv[]) {
     }
 
     int n = atoi(argv[1]); // 方程组的阶数
-    if (n <= 0 || n > 100) {
-        printf("矩阵阶数必须介于1和100之间。\n");
+    if (n <= 0) {
+        printf("矩阵阶数必须是正整数。\n");
         return 1;
     }
 
-    double matrix[100][100];
-    double constants[100];
-    double results[100];
+    // 动态分配内存
+    double **matrix = (double **)malloc(n * sizeof(double *));
+    for (int i = 0; i < n; i++) {
+        matrix[i] = (double *)malloc(n * sizeof(double));
+    }
+    double *constants = (double *)malloc(n * sizeof(double));
+    double *results = (double *)malloc(n * sizeof(double));
 
     // 从标准输入读取系数矩阵
     printf("请输入 %d x %d 矩阵元素:\n", n, n);
@@ -85,6 +89,14 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < n; i++) {
         printf("x%d = %.2f\n", i + 1, results[i]);
     }
+
+    // 释放动态分配的内存
+    for (int i = 0; i < n; i++) {
+        free(matrix[i]);
+    }
+    free(matrix);
+    free(constants);
+    free(results);
 
     return 0;
 }
