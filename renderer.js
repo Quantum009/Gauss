@@ -346,3 +346,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// 在 renderer.js 底部添加以下代码
+const { ipcRenderer } = require('electron');
+
+// 处理菜单事件
+ipcRenderer.on('new-matrix', () => {
+    clearInputs();
+});
+
+ipcRenderer.on('clear-inputs', () => {
+    clearInputs();
+});
+
+ipcRenderer.on('fill-example', () => {
+    fillExampleData();
+});
+
+ipcRenderer.on('show-about', () => {
+    alert('高斯消元法求解器 v1.0.0\n作者：Quantum\n');
+});
