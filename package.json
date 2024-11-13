@@ -1,15 +1,28 @@
 {
-  "name": "gauss",
+  "name": "gaussian-solver",
   "version": "1.0.0",
-  "description": "高斯消元法求线性方程组",
+  "description": "高斯消元法方程组求解器",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron .",
+    "build-c": "gcc Gauss.c -o Gauss.exe",
+    "postinstall": "npm run build-c",
+    "package": "electron-builder"
   },
-  "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "electron": "^32.1.0"
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^20.0.0",
+    "electron-builder": "^23.0.0"
+  },
+  "build": {
+    "appId": "com.gaussian.solver",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "extraFiles": [
+      "Gauss.exe"
+    ]
   }
 }
