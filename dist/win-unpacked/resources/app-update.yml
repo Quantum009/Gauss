@@ -1,0 +1,4 @@
+owner: Quantum009
+repo: Gauss
+provider: github
+updaterCacheDirName: gaussian-elimination-solver-updater

@@ -6,47 +6,74 @@
   "scripts": {
     "start": "electron .",
     "build-c": "gcc Gauss.c -o Gauss.exe",
-    "postinstall": "npm run build-c",
+    "postinstall": "npm run build-c && electron-builder install-app-deps",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "npm run build-c && electron-builder",
+    "dist:win": "npm run build-c && electron-builder --win",
+    "dist:portable": "npm run build-c && electron-builder --win portable"
   },
-  "author": "Quantum",
+  "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
     "electron": "^20.0.0",
     "electron-builder": "^23.0.0"
   },
+  "dependencies": {
+    "@electron/remote": "^2.0.1"
+  },
   "build": {
     "appId": "com.gaussian.solver",
     "productName": "高斯消元法求解器",
+    "copyright": "Copyright © 2024",
+    "asar": true,
+    "asarUnpack": [
+      "Gauss.exe"
+    ],
     "directories": {
-      "output": "dist"
+      "output": "dist",
+      "buildResources": "build"
     },
     "files": [
       "**/*",
-      "!**/*.c"
+      "!**/*.c",
+      "!dist/*",
+      "!build/*"
     ],
-    "extraFiles": [
+    "extraResources": [
       {
-        "from": "Gauss.exe",
-        "to": "Gauss.exe"
+        "from": "./Gauss.exe",
+        "to": "./Gauss.exe"
       }
     ],
     "win": {
       "target": [
-        "nsis",
-        "portable"
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
       ],
       "icon": "icon.ico"
     },
     "nsis": {
       "oneClick": false,
+      "perMachine": true,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "高斯消元法求解器",
       "installerIcon": "icon.ico",
-      "uninstallerIcon": "icon.ico"
+      "uninstallerIcon": "icon.ico",
+      "installerHeaderIcon": "icon.ico",
+      "menuCategory": "高斯消元法求解器",
+      "displayLanguageSelector": true,
+      "language": "2052"
+    },
+    "portable": {
+      "artifactName": "高斯消元法求解器-便携版.exe"
     }
   }
 }

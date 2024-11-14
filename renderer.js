@@ -1,6 +1,7 @@
 const { spawn } = require('child_process');
 const path = require('path');
-
+const electron = require('electron');
+const isDev = process.env.NODE_ENV === 'development';
 // 更新矩阵输入界面
 function createMatrixInputs() {
     const size = parseInt(document.getElementById('size').value);
@@ -180,7 +181,15 @@ async function submitMatrix() {
         }
 
         // 调用求解程序
-        const exePath = path.join(__dirname, 'Gauss.exe');
+        let exePath;
+        if (isDev) {
+            // 开发环境
+            exePath = path.join(__dirname, 'Gauss.exe');
+        } else {
+            // 生产环境
+            const resourcePath = process.resourcesPath;
+            exePath = path.join(resourcePath, 'Gauss.exe');
+        }
         const args = [size.toString()];
         const resultArea = document.getElementById('result');
         resultArea.textContent = '计算中...\n';

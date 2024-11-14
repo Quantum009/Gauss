@@ -32,23 +32,19 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "使用方法: %s <矩阵阶数>\n", argv[0]);
         return 1;
     }
-
     int n = atoi(argv[1]);
     if (n <= 0 || n > 10) {
         fprintf(stderr, "错误：矩阵阶数必须在1到10之间。\n");
         return 1;
     }
-
     // 分配内存
     double **matrix = (double **)malloc(n * sizeof(double *));
     double *constants = (double *)malloc(n * sizeof(double));
     double *results = (double *)malloc(n * sizeof(double));
-    
     if (!matrix || !constants || !results) {
         fprintf(stderr, "内存分配失败\n");
         return 1;
     }
-
     for (int i = 0; i < n; i++) {
         matrix[i] = (double *)malloc(n * sizeof(double));
         if (!matrix[i]) {
@@ -180,3 +176,4 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
