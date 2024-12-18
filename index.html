@@ -3,177 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高斯消元法求解器</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>线性方程组求解器</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4F46E5;
-            --primary-light: #818CF8;
-            --primary-dark: #3730A3;
-            --background-color: #F9FAFB;
-            --surface-color: #FFFFFF;
-            --text-color: #1F2937;
-            --border-color: #E5E7EB;
-            --error-color: #DC2626;
-            --success-color: #10B981;
+            --primary-color: #1565C0;
+            --secondary-color: #2196F3;
+            --background-color: #FFFFFF;
+            --panel-color: #F5F5F5;
+            --border-color: #E0E0E0;
+            --text-color: #212121;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Noto Sans SC', sans-serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         body {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
             background-color: var(--background-color);
             color: var(--text-color);
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 2rem;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: var(--surface-color);
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            animation: slideIn 0.5s ease-out;
+        /* 左侧控制面板 */
+        .control-panel {
+            background-color: var(--panel-color);
+            padding: 20px;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid var(--border-color);
+        .control-group {
+            margin-bottom: 20px;
         }
 
-        .header h1 {
+        .control-group h3 {
+            font-size: 14px;
             color: var(--primary-color);
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .header p {
-            color: #6B7280;
-            font-size: 1.1rem;
+        .control-item {
+            margin-bottom: 15px;
         }
 
-        .form-group {
-            margin-bottom: 2rem;
+        .control-item label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
         }
 
-        .size-control {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            background-color: #F3F4F6;
-            padding: 1rem;
-            border-radius: 0.5rem;
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
         }
 
-        .size-control label {
-            font-weight: 500;
-            color: var(--text-color);
-        }
-
-        .size-control input[type="number"] {
-            width: 80px;
-            padding: 0.5rem;
-            border: 2px solid var(--border-color);
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .size-control input[type="number"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        /* 主要内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            padding: 20px;
+            gap: 20px;
+            overflow: hidden;
         }
 
         .matrix-container {
-            background: #F9FAFB;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .matrix-input {
+            background: white;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
         }
 
         .matrix-row {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.3s ease;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
-        .matrix-row:hover {
-            background-color: rgba(79, 70, 229, 0.05);
-        }
-
-        .input-wrapper {
-            position: relative;
-            padding: 0.25rem;
-        }
-
-        .matrix-input {
+        .cell-input {
             width: 80px;
-            padding: 0.5rem;
-            border: 2px solid var(--border-color);
-            border-radius: 0.5rem;
-            font-size: 1rem;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             text-align: center;
-            transition: all 0.3s ease;
+            font-family: monospace;
         }
 
-        .matrix-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-            transform: scale(1.05);
-        }
+        .result-panel {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow-y: auto;
+}
 
-        .equals-sign {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin: 0 1rem;
-        }
+.result-header {
+    padding: 10px 20px;
+    background-color: #424242;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 500;
+    color: white;  /* 标题文字改为白色 */
+}
 
+#result {
+    padding: 20px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;  /* 结果文字改为深色 */
+    background-color: white;  /* 结果区域背景改为白色 */
+}
+
+
+        /* 按钮样式 */
         .button-group {
             display: flex;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         button {
-            padding: 0.75rem 1.5rem;
+            padding: 8px 16px;
             border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 500;
+            border-radius: 4px;
+            font-size: 14px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
+            font-weight: 500;
         }
 
         .primary-button {
@@ -181,216 +154,77 @@
             color: white;
         }
 
-        .primary-button:hover:not(:disabled) {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
         .secondary-button {
-            background-color: #F3F4F6;
+            background-color: var(--panel-color);
             color: var(--text-color);
         }
 
-        .secondary-button:hover {
-            background-color: #E5E7EB;
-            transform: translateY(-2px);
-        }
-
-        .result-container {
-            background-color: #F8FAFC;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .result-container h2 {
-            color: var(--primary-color);
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        #result {
-            font-family: 'Consolas', monospace;
-            white-space: pre-wrap;
-            padding: 1rem;
-            background-color: var(--surface-color);
-            border-radius: 0.5rem;
-            border: 1px solid var(--border-color);
-            max-height: 400px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .loading {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-            display: none;
-        }
-
+        /* 错误提示 */
         .error-message {
-            background-color: var(--error-color);
-            color: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin: 1rem 0;
-            animation: shake 0.5s ease-in-out;
+            padding: 10px;
+            background-color: #FFEBEE;
+            color: #C62828;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
         }
 
-        .copy-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--success-color);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
+        /* 暗色主题下的样式 */
+@media (prefers-color-scheme: dark) {
+    .result-panel {
+        background: #1E1E1E;  /* 深色主题下使用深色背景 */
+        border-color: #333;
+    }
 
-        /* Animations */
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+    .result-header {
+        background-color: #333;
+        border-bottom-color: #444;
+    }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        @keyframes slideIn {
-            from { 
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        .fade-out {
-            animation: fadeOut 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            button {
-                width: 100%;
-            }
-
-            .matrix-row {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .matrix-input {
-                width: 60px;
-            }
-        }
-
-        /* 暗色主题支持 */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --primary-color: #818CF8;
-                --primary-light: #A5B4FC;
-                --primary-dark: #6366F1;
-                --background-color: #1F2937;
-                --surface-color: #374151;
-                --text-color: #F9FAFB;
-                --border-color: #4B5563;
-            }
-
-            .matrix-input {
-                background-color: #4B5563;
-                color: white;
-            }
-
-            .matrix-input::placeholder {
-                color: #9CA3AF;
-            }
-
-            .secondary-button {
-                background-color: #4B5563;
-                color: white;
-            }
-
-            .secondary-button:hover {
-                background-color: #6B7280;
-            }
-
-            #result {
-                background-color: #4B5563;
-                color: #F9FAFB;
-            }
-        }
+    #result {
+        color: #E0E0E0;  /* 深色主题下文字改为浅色 */
+        background-color: #1E1E1E;
+    }
+}
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>高斯消元法求解器</h1>
-            <p>还未内测，敬请期待！</p>
-        </div>
-
-        <div class="form-group">
-            <div class="size-control">
-                <label for="size">方程组阶数:</label>
-                <input type="number" id="size" min="1" max="10" value="3" onchange="createMatrixInputs()">
-                <div class="tooltip">1-10之间的整数</div>
+    <div class="control-panel">
+        <div class="control-group">
+            <h3>基本设置</h3>
+            <div class="control-item">
+                <label for="size">方程组阶数</label>
+                <input type="number" id="size" min="1" max="20" value="3">
             </div>
+            <div class="control-item">
+                <label for="solve-method">求解方法</label>
+                <select id="solve-method">
+                    <option value="0">高斯消元法</option>
+                    <option value="1">高斯-赛德尔迭代法</option>
+                </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <h3>操作</h3>
+            <div class="button-group">
+                <button class="primary-button" onclick="submitMatrix()" id="solve-button">求解</button>
+                <button class="secondary-button" onclick="clearInputs()">清空</button>
+            </div>
+            <div class="button-group">
+                <button class="secondary-button" onclick="fillExampleData()">示例</button>
+                <button class="secondary-button" onclick="copyResults()">复制结果</button>
+            </div>
+        </div>
+    </div>
 
-            <div id="matrix-input" class="matrix-container">
+    <div class="main-content">
+        <div class="matrix-container">
+            <div class="matrix-input" id="matrix-input">
                 <!-- 矩阵输入区域由 JavaScript 动态生成 -->
             </div>
         </div>
-
-        <div class="button-group">
-            <button id="solve-button" class="primary-button" onclick="submitMatrix()">
-                <span>求解</span>
-                <div class="loading"></div>
-            </button>
-            <button class="secondary-button" onclick="fillExampleData()">填充示例</button>
-            <button class="secondary-button" onclick="clearInputs()">清空输入</button>
-            <button class="secondary-button" onclick="copyResults()">复制结果</button>
-        </div>
-
-        <div class="result-container">
-            <h2>计算过程与结果</h2>
+        <div class="result-panel">
+            <div class="result-header">计算结果</div>
             <pre id="result"></pre>
         </div>
     </div>

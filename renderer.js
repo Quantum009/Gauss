@@ -2,109 +2,60 @@ const { spawn } = require('child_process');
 const path = require('path');
 const electron = require('electron');
 const isDev = process.env.NODE_ENV === 'development';
-// 更新矩阵输入界面
+
+// 创建矩阵输入界面
 function createMatrixInputs() {
     const size = parseInt(document.getElementById('size').value);
+    if (size < 1 || size > 20) {
+        showError('矩阵阶数必须在1到20之间');
+        return;
+    }
+
     const matrixInput = document.getElementById('matrix-input');
     matrixInput.innerHTML = '';
-    
-    const matrixContainer = document.createElement('div');
-    matrixContainer.className = 'matrix-container fade-in';
     
     for (let i = 0; i < size; i++) {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'matrix-row';
-        rowDiv.style.animationDelay = `${i * 0.1}s`;
 
         // 系数矩阵输入
         for (let j = 0; j < size; j++) {
-            const inputWrapper = document.createElement('div');
-            inputWrapper.className = 'input-wrapper';
-            
             const input = document.createElement('input');
             input.type = 'number';
             input.id = `a${i}_${j}`;
-            input.className = 'matrix-input';
+            input.className = 'cell-input';
             input.placeholder = `a${i+1}${j+1}`;
             input.step = 'any';
-            
-            // 添加输入验证和格式化
-            input.addEventListener('input', function() {
-                validateNumberInput(this);
-            });
-            
-            // 添加键盘导航
-            input.addEventListener('keydown', function(e) {
-                handleMatrixNavigation(e, i, j, size);
-            });
-            
-            // 添加焦点样式
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused');
-            });
-            
-            input.addEventListener('blur', function() {
-                this.parentElement.classList.remove('focused');
-            });
-
-            inputWrapper.appendChild(input);
-            rowDiv.appendChild(inputWrapper);
+            input.addEventListener('input', validateNumberInput);
+            input.addEventListener('keydown', (e) => handleMatrixNavigation(e, i, j, size));
+            rowDiv.appendChild(input);
         }
 
-        // 等号
-        const equalsSign = document.createElement('span');
-        equalsSign.className = 'equals-sign';
-        equalsSign.textContent = '=';
-        rowDiv.appendChild(equalsSign);
-
         // 常数项输入
-        const bWrapper = document.createElement('div');
-        bWrapper.className = 'input-wrapper';
-        
         const bInput = document.createElement('input');
         bInput.type = 'number';
         bInput.id = `b${i}`;
-        bInput.className = 'matrix-input';
+        bInput.className = 'cell-input';
         bInput.placeholder = `b${i+1}`;
         bInput.step = 'any';
-        
-        bInput.addEventListener('input', function() {
-            validateNumberInput(this);
-        });
-        
-        bInput.addEventListener('keydown', function(e) {
-            handleConstantNavigation(e, i, size);
-        });
-        
-        bInput.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
-        });
-        
-        bInput.addEventListener('blur', function() {
-            this.parentElement.classList.remove('focused');
-        });
+        bInput.addEventListener('input', validateNumberInput);
+        bInput.addEventListener('keydown', (e) => handleConstantNavigation(e, i, size));
 
-        bWrapper.appendChild(bInput);
-        rowDiv.appendChild(bWrapper);
-
-        matrixContainer.appendChild(rowDiv);
+        rowDiv.appendChild(bInput);
+        matrixInput.appendChild(rowDiv);
     }
-    
-    matrixInput.appendChild(matrixContainer);
 }
 
-// 数字输入验证和格式化
-function validateNumberInput(input) {
+// 验证数字输入
+function validateNumberInput(event) {
+    const input = event.target;
     let value = input.value.trim();
     
-    // 允许负号和小数点
     if (value === '-' || value === '.') return;
     
-    // 处理数值
     if (value !== '') {
         const num = parseFloat(value);
         if (!isNaN(num)) {
-            // 限制小数位数为6位
             input.value = parseFloat(num.toFixed(6));
         } else {
             input.value = '';
@@ -112,11 +63,61 @@ function validateNumberInput(input) {
     }
 }
 
-// 检查输入是否合法
+// 矩阵输入导航
+function handleMatrixNavigation(event, i, j, size) {
+    if (event.key === 'Enter' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        if (j < size - 1) {
+            document.getElementById(`a${i}_${j+1}`).focus();
+        } else {
+            document.getElementById(`b${i}`).focus();
+        }
+    } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        if (j > 0) {
+            document.getElementById(`a${i}_${j-1}`).focus();
+        }
+    } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        if (i < size - 1) {
+            document.getElementById(`a${i+1}_${j}`).focus();
+        }
+    } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (i > 0) {
+            document.getElementById(`a${i-1}_${j}`).focus();
+        }
+    }
+}
+
+// 常数项导航
+function handleConstantNavigation(event, i, size) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        if (i < size - 1) {
+            document.getElementById(`a${i+1}_0`).focus();
+        }
+    } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        document.getElementById(`a${i}_${size-1}`).focus();
+    } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        if (i < size - 1) {
+            document.getElementById(`b${i+1}`).focus();
+        }
+    } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (i > 0) {
+            document.getElementById(`b${i-1}`).focus();
+        }
+    }
+}
+
+// 验证输入
 function validateInput() {
     const size = parseInt(document.getElementById('size').value);
-    if (size < 1 || size > 10) {
-        showError('矩阵阶数必须在1到10之间');
+    if (size < 1 || size > 20) {
+        showError('矩阵阶数必须在1到20之间');
         return false;
     }
 
@@ -141,59 +142,31 @@ function validateInput() {
     return true;
 }
 
-// 提交计算
+// 提交求解
 async function submitMatrix() {
-    if (!validateInput()) {
-        return;
+    if (!validateInput()) return;
+
+    const size = parseInt(document.getElementById('size').value);
+    const method = document.getElementById('solve-method').value;
+    
+    if (method === '0' && size > 10) {
+        if (!confirm('对于大规模方程组（>10），建议使用高斯-赛德尔法。是否继续使用高斯消元法？')) {
+            return;
+        }
     }
 
     const solveButton = document.getElementById('solve-button');
-    const buttonText = solveButton.querySelector('span');
-    const loading = solveButton.querySelector('.loading');
-    buttonText.textContent = '计算中...';
-    loading.style.display = 'inline-block';
     solveButton.disabled = true;
+    const resultArea = document.getElementById('result');
+    resultArea.textContent = '计算中...\n';
 
     try {
-        const size = parseInt(document.getElementById('size').value);
-        let inputString = '';
+        const inputString = generateInputString(size);
+        const exePath = isDev ? 
+            path.join(__dirname, 'Gauss.exe') : 
+            path.join(process.resourcesPath, 'Gauss.exe');
 
-        // 首先添加矩阵元素提示语
-        inputString += `请输入 ${size} x ${size} 矩阵元素:\n`;
-
-        // 添加矩阵系数
-        for (let i = 0; i < size; i++) {
-            let rowString = '';
-            for (let j = 0; j < size; j++) {
-                const value = parseFloat(document.getElementById(`a${i}_${j}`).value) || 0;
-                rowString += value + ' ';
-            }
-            inputString += rowString.trim() + '\n';
-        }
-
-        // 添加常数项提示语
-        inputString += '请输入常数项:\n';
-
-        // 添加常数项
-        for (let i = 0; i < size; i++) {
-            const value = parseFloat(document.getElementById(`b${i}`).value) || 0;
-            inputString += value + '\n';
-        }
-
-        // 调用求解程序
-        let exePath;
-        if (isDev) {
-            // 开发环境
-            exePath = path.join(__dirname, 'Gauss.exe');
-        } else {
-            // 生产环境
-            const resourcePath = process.resourcesPath;
-            exePath = path.join(resourcePath, 'Gauss.exe');
-        }
-        const args = [size.toString()];
-        const resultArea = document.getElementById('result');
-        resultArea.textContent = '计算中...\n';
-        
+        const args = [size.toString(), method];
         const cProgram = spawn(exePath, args);
         let output = '';
         let errorOutput = '';
@@ -203,10 +176,6 @@ async function submitMatrix() {
             output += text;
             resultArea.textContent = output;
             resultArea.scrollTop = resultArea.scrollHeight;
-            
-            // 添加高亮效果
-            resultArea.classList.add('highlight');
-            setTimeout(() => resultArea.classList.remove('highlight'), 300);
         });
 
         cProgram.stderr.on('data', (data) => {
@@ -216,8 +185,6 @@ async function submitMatrix() {
 
         cProgram.on('error', (err) => {
             showError(`启动求解程序失败: ${err.message}`);
-            buttonText.textContent = '求解';
-            loading.style.display = 'none';
             solveButton.disabled = false;
         });
 
@@ -226,40 +193,70 @@ async function submitMatrix() {
                 if (!output.trim()) {
                     showError('计算完成但没有输出结果');
                 }
-            } else {
+            }
+            else {
                 showError(`计算过程出错 (错误代码: ${code})\n${errorOutput}`);
             }
-            
-            buttonText.textContent = '求解';
-            loading.style.display = 'none';
             solveButton.disabled = false;
         });
 
-        // 写入输入数据
         cProgram.stdin.write(inputString);
         cProgram.stdin.end();
 
     } catch (error) {
         showError('程序执行出错：' + error.message);
-        buttonText.textContent = '求解';
-        loading.style.display = 'none';
         solveButton.disabled = false;
     }
 }
 
+// 生成输入字符串
+function generateInputString(size) {
+    let inputString = '';
+    
+    // 矩阵元素提示语
+    inputString += `请输入 ${size} x ${size} 矩阵元素:\n`;
+
+    // 添加矩阵系数
+    for (let i = 0; i < size; i++) {
+        let rowString = '';
+        for (let j = 0; j < size; j++) {
+            const value = parseFloat(document.getElementById(`a${i}_${j}`).value) || 0;
+            rowString += value + ' ';
+        }
+        inputString += rowString.trim() + '\n';
+    }
+
+    // 常数项提示语
+    inputString += '请输入常数项:\n';
+
+    // 添加常数项
+    for (let i = 0; i < size; i++) {
+        const value = parseFloat(document.getElementById(`b${i}`).value) || 0;
+        inputString += value + '\n';
+    }
+
+    return inputString;
+}
+
 // 错误提示
 function showError(message) {
+    const existingError = document.querySelector('.error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+
     const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message fade-in';
+    errorDiv.className = 'error-message';
     errorDiv.textContent = message;
     
-    const container = document.querySelector('.container');
-    container.insertBefore(errorDiv, document.getElementById('result').parentElement);
-    
+    const matrixContainer = document.querySelector('.matrix-container');
+    matrixContainer.insertBefore(errorDiv, matrixContainer.firstChild);
+
     setTimeout(() => {
-        errorDiv.classList.add('fade-out');
-        setTimeout(() => errorDiv.remove(), 300);
-    }, 3000);
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 5000);
 }
 
 // 填充示例数据
@@ -267,60 +264,47 @@ function fillExampleData() {
     const size = parseInt(document.getElementById('size').value);
     const examples = {
         2: {
-            matrix: [[0, 1], [1, 0]],
-            constants: [0, 1]
+            matrix: [[2, -1], [-1, 2]],
+            constants: [1, 1]
         },
         3: {
-            matrix: [[2, 1, -1], [4, -1, 1], [-2, 3, 1]],
-            constants: [2, 1, 3]
+            matrix: [[4, -1, 0], [-1, 4, -1], [0, -1, 4]],
+            constants: [1, 5, 2]
         },
         4: {
-            matrix: [[4, -1, 0, 0], [-1, 4, -1, 0], [0, -1, 4, -1], [0, 0, -1, 3]],
-            constants: [1, 0, 0, 1]
+            matrix: [
+                [10, -1, 2, 0],
+                [-1, 11, -1, 3],
+                [2, -1, 10, -1],
+                [0, 3, -1, 8]
+            ],
+            constants: [6, 25, -11, 15]
         }
     };
 
-    if (!examples[size]) {
+    const example = examples[size];
+    if (!example) {
         showError(`暂无 ${size}x${size} 的示例数据`);
         return;
     }
 
-    const example = examples[size];
-    
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
-            setTimeout(() => {
-                const input = document.getElementById(`a${i}_${j}`);
-                input.value = example.matrix[i][j];
-                input.classList.add('highlight');
-                setTimeout(() => input.classList.remove('highlight'), 500);
-            }, (i * size + j) * 100);
+            const input = document.getElementById(`a${i}_${j}`);
+            input.value = example.matrix[i][j];
         }
-        
-        setTimeout(() => {
-            const input = document.getElementById(`b${i}`);
-            input.value = example.constants[i];
-            input.classList.add('highlight');
-            setTimeout(() => input.classList.remove('highlight'), 500);
-        }, (i * size + size) * 100);
+        const input = document.getElementById(`b${i}`);
+        input.value = example.constants[i];
     }
 }
 
 // 清空输入
 function clearInputs() {
-    const inputs = document.querySelectorAll('input[type="number"]');
-    inputs.forEach((input, index) => {
-        setTimeout(() => {
-            input.value = '';
-            input.classList.add('fade-out');
-            setTimeout(() => input.classList.remove('fade-out'), 300);
-        }, index * 50);
+    const inputs = document.querySelectorAll('.cell-input');
+    inputs.forEach(input => {
+        input.value = '';
     });
-
-    const resultArea = document.getElementById('result');
-    resultArea.textContent = '';
-    resultArea.classList.add('fade-out');
-    setTimeout(() => resultArea.classList.remove('fade-out'), 300);
+    document.getElementById('result').textContent = '';
 }
 
 // 复制结果
@@ -328,16 +312,16 @@ function copyResults() {
     const resultArea = document.getElementById('result');
     const text = resultArea.textContent;
     
+    if (!text.trim()) {
+        showError('没有可复制的结果');
+        return;
+    }
+
     navigator.clipboard.writeText(text).then(() => {
-        const notification = document.createElement('div');
-        notification.className = 'copy-notification fade-in';
-        notification.textContent = '已复制到剪贴板';
-        document.body.appendChild(notification);
-        
+        const originalText = resultArea.textContent;
+        resultArea.textContent = '结果已复制到剪贴板\n' + originalText;
         setTimeout(() => {
-            notification.classList.remove('fade-in');
-            notification.classList.add('fade-out');
-            setTimeout(() => notification.remove(), 300);
+            resultArea.textContent = originalText;
         }, 1500);
     }).catch(err => {
         showError('复制失败：' + err.message);
@@ -348,6 +332,11 @@ function copyResults() {
 document.addEventListener('DOMContentLoaded', () => {
     createMatrixInputs();
     
+    // 监听矩阵大小变化
+    document.getElementById('size').addEventListener('change', () => {
+        createMatrixInputs();
+    });
+
     // 添加快捷键支持
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.key === 'Enter') {
@@ -356,10 +345,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// 在 renderer.js 底部添加以下代码
+// 处理菜单事件
 const { ipcRenderer } = require('electron');
 
-// 处理菜单事件
 ipcRenderer.on('new-matrix', () => {
     clearInputs();
 });
@@ -373,5 +361,24 @@ ipcRenderer.on('fill-example', () => {
 });
 
 ipcRenderer.on('show-about', () => {
-    alert('高斯消元法求解器 v1.0.0\n作者：Quantum\n');
+    const version = '1.0.0';
+    const message = `线性方程组求解器 v${version}\n\n` +
+                   '支持方法：\n' +
+                   '- 高斯消元法\n' +
+                   '- 高斯-赛德尔迭代法\n\n' +
+                   '适用范围：\n' +
+                   '- 1-20阶线性方程组\n' +
+                   '- 对于大规模方程组(>10)建议使用高斯-赛德尔法\n\n' +
+                   '快捷键：\n' +
+                   'Ctrl+Enter: 求解\n' +
+                   'Ctrl+N: 新建\n' +
+                   'Ctrl+Delete: 清空';
+    
+    const { dialog } = require('@electron/remote');
+    dialog.showMessageBox({
+        type: 'info',
+        title: '关于',
+        message: message,
+        buttons: ['确定']
+    });
 });

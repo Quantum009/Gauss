@@ -1,8 +1,8 @@
-version: 1.0.0
+version: 0.2.0
 files:
-  - url: gaussian-elimination-solver-setup-1.0.0.exe
-    sha512: +PJ/T8yggZ2IgvOdwA8n42BNVAnxhUA2lGrc55Gt2069MUVFlGN5g8H6dfdz8yoCWy6d/QLpV4YLtEaLtQExvw==
-    size: 61003131
-path: gaussian-elimination-solver-setup-1.0.0.exe
-sha512: +PJ/T8yggZ2IgvOdwA8n42BNVAnxhUA2lGrc55Gt2069MUVFlGN5g8H6dfdz8yoCWy6d/QLpV4YLtEaLtQExvw==
-releaseDate: '2024-11-14T08:19:49.743Z'
+  - url: elimination-solver-setup-0.2.0.exe
+    sha512: 5pYfKxKpDtxc8kYSuWDdKbsPiPEYigUvybXaL+cgn9TGIGX59MVss76ZuruRJcfoKJGCfEr5DK0iYlvwJAYZ4A==
+    size: 61001132
+path: elimination-solver-setup-0.2.0.exe
+sha512: 5pYfKxKpDtxc8kYSuWDdKbsPiPEYigUvybXaL+cgn9TGIGX59MVss76ZuruRJcfoKJGCfEr5DK0iYlvwJAYZ4A==
+releaseDate: '2024-12-18T12:46:12.326Z'

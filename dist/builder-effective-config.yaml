@@ -2,7 +2,7 @@ directories:
   output: dist
   buildResources: build
 appId: com.gaussian.solver
-productName: 高斯消元法求解器
+productName: 线性方程组求解器
 copyright: Copyright © 2024
 asar: true
 asarUnpack:
@@ -31,13 +31,13 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: 高斯消元法求解器
+  shortcutName: 线性方程组求解器
   installerIcon: icon.ico
   uninstallerIcon: icon.ico
   installerHeaderIcon: icon.ico
-  menuCategory: 高斯消元法求解器
+  menuCategory: 线性方程组求解器
   displayLanguageSelector: true
   language: '2052'
 portable:
-  artifactName: 高斯消元法求解器-便携版.exe
+  artifactName: 线性方程组求解器-便携版.exe
 electronVersion: 20.3.12
