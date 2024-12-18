@@ -216,8 +216,8 @@ int main(int argc, char* argv[]) {
     int n = atoi(argv[1]);
     int method = atoi(argv[2]); // 0: 高斯消元法, 1: 高斯-赛德尔法
     
-    if (n <= 0 || n > 20) {
-        fprintf(stderr, "错误：矩阵阶数必须在1到20之间。\n");
+    if (n <= 0 || n > 100) {
+        fprintf(stderr, "错误：矩阵阶数必须在1到100之间。\n");
         return 1;
     }
 

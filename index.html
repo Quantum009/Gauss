@@ -28,14 +28,62 @@
             height: 100vh;
             background-color: var(--background-color);
             color: var(--text-color);
+            overflow: hidden;
         }
 
-        /* 左侧控制面板 */
         .control-panel {
             background-color: var(--panel-color);
             padding: 20px;
             border-right: 1px solid var(--border-color);
             overflow-y: auto;
+            height: 100vh;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .matrix-container {
+            background: white;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .result-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .result-header {
+            padding: 10px 20px;
+            background-color: #424242;
+            color: white;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+
+        #result {
+            flex: 1;
+            padding: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-y: auto;
+            background-color: white;
+            color: #333;
         }
 
         .control-group {
@@ -60,7 +108,7 @@
             margin-bottom: 5px;
         }
 
-        select, input[type="number"] {
+        input[type="number"], select {
             width: 100%;
             padding: 8px;
             border: 1px solid var(--border-color);
@@ -69,75 +117,54 @@
             background-color: white;
         }
 
-        /* 主要内容区域 */
-        .main-content {
-            display: grid;
-            grid-template-rows: auto 1fr;
-            padding: 20px;
-            gap: 20px;
-            overflow: hidden;
+        /* 恢复特定输入框的增减按钮 */
+        #size::-webkit-outer-spin-button,
+        #size::-webkit-inner-spin-button,
+        #decimal-places::-webkit-outer-spin-button,
+        #decimal-places::-webkit-inner-spin-button {
+            -webkit-appearance: auto;
+            appearance: auto;
+            margin: 0;
         }
 
-        .matrix-container {
-            display: grid;
-            grid-template-columns: auto auto;
-            gap: 20px;
-            align-items: start;
+        /* 移除其他数字输入框的增减按钮 */
+        .cell-input::-webkit-outer-spin-button,
+        .cell-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
         }
 
-        .matrix-input {
-            background: white;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+        #size,
+        #decimal-places {
+            -moz-appearance: textfield;
+            appearance: textfield;
         }
 
         .matrix-row {
             display: flex;
             gap: 8px;
             margin-bottom: 8px;
+            flex-wrap: nowrap;
         }
 
         .cell-input {
+            appearance: textfield;
+            -webkit-appearance: textfield;
+            -moz-appearance: textfield;
             width: 80px;
             padding: 8px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            text-align: center;
+            text-align: right;
             font-family: monospace;
+            background-color: white;
         }
 
-        .result-panel {
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    overflow-y: auto;
-}
-
-.result-header {
-    padding: 10px 20px;
-    background-color: #424242;
-    border-bottom: 1px solid var(--border-color);
-    font-weight: 500;
-    color: white;  /* 标题文字改为白色 */
-}
-
-#result {
-    padding: 20px;
-    font-family: monospace;
-    white-space: pre-wrap;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #333;  /* 结果文字改为深色 */
-    background-color: white;  /* 结果区域背景改为白色 */
-}
-
-
-        /* 按钮样式 */
         .button-group {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         button {
@@ -147,6 +174,11 @@
             font-size: 14px;
             cursor: pointer;
             font-weight: 500;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .primary-button {
@@ -159,7 +191,6 @@
             color: var(--text-color);
         }
 
-        /* 错误提示 */
         .error-message {
             padding: 10px;
             background-color: #FFEBEE;
@@ -169,23 +200,58 @@
             font-size: 14px;
         }
 
-        /* 暗色主题下的样式 */
-@media (prefers-color-scheme: dark) {
-    .result-panel {
-        background: #1E1E1E;  /* 深色主题下使用深色背景 */
-        border-color: #333;
-    }
+        #file-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px dashed var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-    .result-header {
-        background-color: #333;
-        border-bottom-color: #444;
-    }
+        .range-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    #result {
-        color: #E0E0E0;  /* 深色主题下文字改为浅色 */
-        background-color: #1E1E1E;
-    }
-}
+        .range-inputs input[type="number"] {
+            width: 100px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #2196F3;
+                --secondary-color: #64B5F6;
+                --background-color: #212121;
+                --panel-color: #424242;
+                --border-color: #616161;
+                --text-color: #FFFFFF;
+            }
+
+            .cell-input, select, input[type="number"] {
+                background-color: #333;
+                color: white;
+            }
+
+            #file-input {
+                background-color: #333;
+                color: white;
+            }
+
+            .result-panel {
+                background: #1E1E1E;
+            }
+
+            #result {
+                color: #E0E0E0;
+                background-color: #1E1E1E;
+            }
+
+            .error-message {
+                background-color: #311B1B;
+                color: #EF5350;
+            }
+        }
     </style>
 </head>
 <body>
@@ -193,8 +259,8 @@
         <div class="control-group">
             <h3>基本设置</h3>
             <div class="control-item">
-                <label for="size">方程组阶数</label>
-                <input type="number" id="size" min="1" max="20" value="3">
+                <label for="size">方程组阶数 (1-100)</label>
+                <input type="number" id="size" min="1" max="100" value="3" step="1">
             </div>
             <div class="control-item">
                 <label for="solve-method">求解方法</label>
@@ -204,6 +270,42 @@
                 </select>
             </div>
         </div>
+
+        <div class="control-group">
+            <h3>输入方式</h3>
+            <div class="control-item">
+                <label for="input-method">选择输入方式</label>
+                <select id="input-method">
+                    <option value="manual">手动输入</option>
+                    <option value="file">文件导入</option>
+                    <option value="random">随机生成</option>
+                </select>
+            </div>
+            
+            <div id="file-input-section" style="display: none;">
+                <div class="control-item">
+                    <label for="file-input">选择文件 (CSV/TXT)</label>
+                    <input type="file" id="file-input" accept=".csv,.txt">
+                </div>
+            </div>
+            
+            <div id="random-input-section" style="display: none;">
+                <div class="control-item">
+                    <label>随机数范围</label>
+                    <div class="range-inputs">
+                        <input type="number" id="random-min" value="-100">
+                        <span>至</span>
+                        <input type="number" id="random-max" value="100">
+                    </div>
+                </div>
+                <div class="control-item">
+                    <label>小数位数</label>
+                    <input type="number" id="decimal-places" value="2" min="0" max="6" step="1">
+                </div>
+                <button class="secondary-button" onclick="generateRandomMatrix()">生成随机矩阵</button>
+            </div>
+        </div>
+
         <div class="control-group">
             <h3>操作</h3>
             <div class="button-group">
@@ -211,7 +313,6 @@
                 <button class="secondary-button" onclick="clearInputs()">清空</button>
             </div>
             <div class="button-group">
-                <button class="secondary-button" onclick="fillExampleData()">示例</button>
                 <button class="secondary-button" onclick="copyResults()">复制结果</button>
             </div>
         </div>
@@ -219,7 +320,7 @@
 
     <div class="main-content">
         <div class="matrix-container">
-            <div class="matrix-input" id="matrix-input">
+            <div id="matrix-input">
                 <!-- 矩阵输入区域由 JavaScript 动态生成 -->
             </div>
         </div>
